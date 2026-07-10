@@ -147,6 +147,10 @@ Single-platform APIs return their own IDs only. SonoVault resolves one recording
 
 No. The server runs locally over stdio and sends your key only to `api.sonovault.now` as a request header. The code is small and auditable: [src/server.ts](src/server.ts).
 
+## Agent Skill
+
+Not using MCP? [`skill/SKILL.md`](skill/SKILL.md) is an [Agent Skill](https://agentskills.io/) that teaches any agent to call the SonoVault API directly over HTTP: search rules, ISRC/ISWC recipes, bulk resolution, and error handling.
+
 ## Related
 
 - [SonoVault API docs](https://sonovault.now/docs)
