@@ -1,0 +1,33 @@
+name: Publish to MCP Registry
+
+# Publishes server.json to the official MCP registry
+# (registry.modelcontextprotocol.io) when a release is published.
+# Auth is GitHub OIDC: valid for the io.github.rekordcloud/* namespace
+# because this workflow runs in the rekordcloud org. No tokens.
+# Note: the npm package must already be on npm (with the matching
+# mcpName field) or registry validation fails.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mcp-publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL=$(gh api repos/modelcontextprotocol/registry/releases/latest \
+            --jq '.assets[] | select(.name | test("linux_amd64.tar.gz$")) | .browser_download_url' | head -1)
+          curl -sL "$URL" | tar xz
+          ./mcp-publisher --version
+      - run: ./mcp-publisher login github-oidc
+      - run: ./mcp-publisher publish
