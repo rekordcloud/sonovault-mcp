@@ -1,0 +1,51 @@
+name: Publish
+
+# Publishes to npm when a GitHub release is published.
+# Auth is npm trusted publishing (OIDC): no token stored anywhere.
+# Configure once on npmjs.com: package sonovault -> Settings -> Trusted publisher
+# -> GitHub Actions -> rekordcloud/sonovault-mcp, workflow publish.yml.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Node 24 bundles npm 11.5.1+, new enough for trusted publishing.
+          # Do NOT npm install -g npm@latest here: self-updating npm mid-run
+          # breaks its bundled sigstore module and --provenance fails.
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - name: Check the tag matches package.json
+        if: github.event_name == 'release'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="${{ github.event.release.tag_name }}"
+          if [ "v$VERSION" != "$TAG" ]; then
+            echo "Tag $TAG does not match package.json version $VERSION"
+            exit 1
+          fi
+      - name: Skip if this version is already on npm
+        id: check
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "sonovault-mcp@$VERSION" version >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "sonovault-mcp@$VERSION already published, skipping"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      # prepublishOnly runs typecheck, tests, and the build.
+      - if: steps.check.outputs.exists == 'false'
+        run: npm publish --provenance --access public

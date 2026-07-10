@@ -1,0 +1,55 @@
+{
+  "name": "sonovault-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for the SonoVault music metadata API. Gives AI assistants track search, ISRC and ISWC lookup, and cross-platform ID resolution for 90M+ tracks.",
+  "mcpName": "io.github.rekordcloud/sonovault",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "modelcontextprotocol",
+    "music",
+    "music-metadata",
+    "isrc",
+    "iswc",
+    "music-api",
+    "spotify",
+    "beatport",
+    "claude",
+    "ai"
+  ],
+  "homepage": "https://sonovault.now",
+  "bugs": "https://github.com/rekordcloud/sonovault-mcp/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rekordcloud/sonovault-mcp.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "sonovault-mcp": "dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean && chmod +x dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "sonovault": "^1.2.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^3.0.0"
+  }
+}

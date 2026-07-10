@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - name: Check package.json and src/server.ts versions agree
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          SRC=$(node -p "require('fs').readFileSync('src/server.ts','utf8').match(/SERVER_VERSION = \"([0-9.]+)\"/)[1]")
+          if [ "$PKG" != "$SRC" ]; then
+            echo "Version drift: package.json=$PKG src/server.ts=$SRC"
+            exit 1
+          fi
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build

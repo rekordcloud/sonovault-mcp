@@ -1,0 +1,17 @@
+# Smithery deployment config: https://smithery.ai/docs
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - apiKey
+    properties:
+      apiKey:
+        type: string
+        description: SonoVault API key. Free tier (1,000 requests/month) at https://sonovault.now
+  commandFunction: |-
+    (config) => ({
+      command: "node",
+      args: ["dist/index.js"],
+      env: { SONOVAULT_API_KEY: config.apiKey }
+    })

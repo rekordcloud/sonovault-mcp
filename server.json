@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.rekordcloud/sonovault",
+  "description": "Music metadata for AI assistants: ISRC and ISWC lookup, track search, and cross-platform ID resolution across Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, and YouTube for 90M+ tracks.",
+  "repository": {
+    "url": "https://github.com/rekordcloud/sonovault-mcp",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "websiteUrl": "https://sonovault.now",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "sonovault-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "SONOVAULT_API_KEY",
+          "description": "SonoVault API key. Free tier (1,000 requests/month) at https://sonovault.now",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
