@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-07-10
+
+### Changed
+
+- README: setup for Cursor, VS Code, and Windsurf; example workflows; FAQ.
+
 ## [1.0.1] - 2026-07-10
 
 ### Changed
