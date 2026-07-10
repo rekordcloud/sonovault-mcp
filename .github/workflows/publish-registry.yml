@@ -29,5 +29,21 @@ jobs:
             --jq '.assets[] | select(.name | test("linux_amd64.tar.gz$")) | .browser_download_url' | head -1)
           curl -sL "$URL" | tar xz
           ./mcp-publisher --version
+      # The npm publish job runs in parallel on release events, and the
+      # registry validates against the published npm package. Wait for npm
+      # to serve the version from server.json before publishing.
+      - name: Wait for the npm package version
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('server.json'))['packages'][0]['version'])")
+          for i in $(seq 1 30); do
+            if npm view "sonovault-mcp@$VERSION" version >/dev/null 2>&1; then
+              echo "sonovault-mcp@$VERSION is on npm"
+              exit 0
+            fi
+            echo "waiting for sonovault-mcp@$VERSION on npm ($i/30)"
+            sleep 20
+          done
+          echo "npm never served $VERSION"
+          exit 1
       - run: ./mcp-publisher login github-oidc
       - run: ./mcp-publisher publish
