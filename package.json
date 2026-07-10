@@ -1,7 +1,7 @@
 {
   "name": "sonovault-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for the SonoVault music metadata API. Gives AI assistants track search, ISRC and ISWC lookup, and cross-platform ID resolution for 90M+ tracks.",
+  "version": "1.0.1",
+  "description": "MCP server for the SonoVault music metadata API. Search 90M+ tracks, artists, and releases; get genre, label, release dates, ISRC/ISWC codes, and cross-platform IDs.",
   "mcpName": "io.github.rekordcloud/sonovault",
   "keywords": [
     "mcp",

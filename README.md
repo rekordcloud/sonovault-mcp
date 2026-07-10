@@ -3,15 +3,16 @@
 [![CI](https://github.com/rekordcloud/sonovault-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rekordcloud/sonovault-mcp/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/sonovault-mcp)](https://www.npmjs.com/package/sonovault-mcp)
 
-MCP server for the **[SonoVault](https://sonovault.now)** music metadata API. Gives Claude, Cursor, and any MCP client access to 90M+ tracks: ISRC and ISWC lookup, fuzzy track search, cross-platform ID resolution (Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, YouTube), artists, labels, releases, and genres.
+MCP server for the **[SonoVault](https://sonovault.now)** music metadata API. Gives Claude, Cursor, and any MCP client search across 90M+ tracks, artists, labels, and releases, with full metadata per result: genre, label, release dates, artist credits, ISRC and ISWC codes, and cross-platform IDs (Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, YouTube).
 
 Ask your assistant things like:
 
-- "Find the ISRC for Daft Punk's Veridis Quo"
-- "What's the Spotify and Beatport ID for ISRC GBDUW0000053?"
-- "List every recording of ISWC T-071.020.439-9"
-- "Resolve this play log to ISRCs and labels" (paste up to 100 lines)
 - "What releases did mau5trap put out this year?"
+- "Find Daft Punk's Veridis Quo and give me its genre, label, and ISRC"
+- "Show me the tracklist of Discovery with ISRCs"
+- "What's the Spotify and Beatport ID for ISRC GBDUW0000053?"
+- "Resolve this play log to ISRCs and labels" (paste up to 100 lines)
+- "List every recording of ISWC T-071.020.439-9"
 
 ## Setup
 

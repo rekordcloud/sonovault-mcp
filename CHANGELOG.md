@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-10
+
+### Changed
+
+- Descriptions now lead with catalog search (tracks, artists, releases) instead of ISRC/ISWC lookup.
+
 ## [1.0.0] - 2026-07-10
 
 ### Added
