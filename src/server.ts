@@ -42,7 +42,7 @@ export function createServer(sv: SonoVault): McpServer {
     {
       title: "Search tracks",
       description:
-        "Search the SonoVault catalog (90M+ tracks) by artist and title. Both are required; there is no free-text search. Returns ISRC, genre, duration, artist credits, and release info (album, label, release date) per track.",
+        "Search the SonoVault catalog (93M+ tracks) by artist and title. Both are required; there is no free-text search. Returns ISRC, genre, duration, artist credits, and release info (album, label, release date) per track.",
       inputSchema: {
         artist: z.string().describe("Artist name, e.g. 'Daft Punk'"),
         title: z.string().describe("Track title, e.g. 'One More Time'"),

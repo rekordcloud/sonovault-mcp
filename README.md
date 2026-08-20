@@ -3,7 +3,7 @@
 [![CI](https://github.com/rekordcloud/sonovault-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rekordcloud/sonovault-mcp/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/sonovault-mcp)](https://www.npmjs.com/package/sonovault-mcp)
 
-MCP server for the **[SonoVault](https://sonovault.now)** music metadata API. Gives Claude, Cursor, and any MCP client search across 90M+ tracks, artists, labels, and releases, with full metadata per result: genre, label, release dates, artist credits, ISRC and ISWC codes, and cross-platform IDs (Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, YouTube).
+MCP server for the **[SonoVault](https://sonovault.now)** music metadata API. Gives Claude, Cursor, and any MCP client search across 93M+ tracks, artists, labels, and releases, with full metadata per result: genre, label, release dates, artist credits, ISRC and ISWC codes, and cross-platform IDs (Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, YouTube).
 
 Ask your assistant things like:
 

@@ -6,7 +6,7 @@ metadata:
   author: rekordcloud
 ---
 
-You query the SonoVault music metadata API: 90M+ tracks with ISRC, ISWC, genre, label, release dates, and cross-platform IDs.
+You query the SonoVault music metadata API: 93M+ tracks with ISRC, ISWC, genre, label, release dates, and cross-platform IDs.
 
 ## Setup
 
