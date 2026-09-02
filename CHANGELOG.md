@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Changed
+
+- `get_release` describes the tracklist it returns: tracks come back in playing order, each with `disc_number` and `track_number`, and a track whose position is unknown sorts last with both null.
+- `search_artists` describes `wikidata_id` and `musicbrainz_id`, the identifiers for joining an artist against external datasets.
+
+Both are description-only, so an assistant knows the fields exist and what the ordering means. No tool signature changed.
+
 ## [1.0.3] - 2026-09-02
 
 ### Changed

@@ -31,7 +31,10 @@ function fakeSv(overrides: Record<string, unknown> = {}) {
       },
     },
     artists: {
-      search: async () => ({ results: [{ id: 1, name: "Daft Punk" }], next_cursor: null }),
+      search: async () => ({
+        results: [{ id: 1, name: "Daft Punk", country: "France", wikidata_id: "Q185828", musicbrainz_id: "056e4f3e-d505-4dad-8ec1-d04f521cbb56" }],
+        next_cursor: null,
+      }),
       releases: async () => ({ results: [], next_cursor: null }),
     },
     labels: {
@@ -40,7 +43,15 @@ function fakeSv(overrides: Record<string, unknown> = {}) {
     },
     releases: {
       search: async () => ({ results: [], next_cursor: null }),
-      get: async () => ({ id: 1, title: "Discovery", tracks: [TRACK] }),
+      get: async () => ({
+        id: 1,
+        title: "Discovery",
+        tracks: [
+          { id: 1, title: "One More Time", artists: [], isrc: "GBDUW0000053", duration: 320, genre: [], subgenre: [], disc_number: 1, track_number: 1 },
+          { id: 2, title: "Aerodynamic", artists: [], isrc: null, duration: 212, genre: [], subgenre: [], disc_number: 1, track_number: 2 },
+          { id: 3, title: "Unknown Slot", artists: [], isrc: null, duration: null, genre: [], subgenre: [], disc_number: null, track_number: null },
+        ],
+      }),
     },
     genres: { list: async () => ({ genres: [{ id: 1, name: "House", type: "main" }] }) },
     ...overrides,
@@ -134,4 +145,40 @@ describe("sonovault-mcp", () => {
     const text = (result.content as Array<{ text: string }>)[0].text;
     expect(text).toContain("Error");
   });
+
+  it("get_release returns the tracklist with disc and track numbers", async () => {
+    const result = await client.callTool({ name: "get_release", arguments: { id: 1 } });
+    const body = JSON.parse((result as any).content[0].text);
+
+    expect(body.tracks.map((t: any) => t.track_number)).toEqual([1, 2, null]);
+    expect(body.tracks[0].disc_number).toBe(1);
+  });
+
+  it("get_release keeps an unknown position null rather than 0", async () => {
+    const result = await client.callTool({ name: "get_release", arguments: { id: 1 } });
+    const body = JSON.parse((result as any).content[0].text);
+
+    const unknown = body.tracks.find((t: any) => t.title === "Unknown Slot");
+    expect(unknown.track_number).toBeNull();
+    expect(unknown.disc_number).toBeNull();
+  });
+
+  it("search_artists returns musicbrainz_id alongside wikidata_id", async () => {
+    const result = await client.callTool({ name: "search_artists", arguments: { name: "Daft Punk" } });
+    const body = JSON.parse((result as any).content[0].text);
+
+    expect(body.results[0].musicbrainz_id).toBe("056e4f3e-d505-4dad-8ec1-d04f521cbb56");
+    expect(body.results[0].wikidata_id).toBe("Q185828");
+  });
+
+  it("describes the tracklist ordering and the artist identifiers in the tool text", async () => {
+    const { tools } = await client.listTools();
+    const release = tools.find((t) => t.name === "get_release");
+    const artists = tools.find((t) => t.name === "search_artists");
+
+    expect(release?.description).toMatch(/playing order/);
+    expect(release?.description).toMatch(/track_number/);
+    expect(artists?.description).toMatch(/musicbrainz_id/);
+  });
 });
+

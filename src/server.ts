@@ -154,7 +154,7 @@ export function createServer(sv: SonoVault): McpServer {
     "search_artists",
     {
       title: "Search artists",
-      description: "Search artists by name. Returns id, name, country, formation year, and release count.",
+      description: "Search artists by name. Returns id, name, country, formation year, release count, and the wikidata_id and musicbrainz_id identifiers for joining against external datasets.",
       inputSchema: {
         name: z.string().describe("Artist name to search for"),
         limit: z.number().int().min(1).max(100).optional(),
@@ -222,7 +222,7 @@ export function createServer(sv: SonoVault): McpServer {
     "get_release",
     {
       title: "Get release with tracklist",
-      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs.",
+      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs. Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null.",
       inputSchema: { id: z.number().int().describe("SonoVault release ID") },
     },
     wrap(async ({ id }) => sv.releases.get(id)),
