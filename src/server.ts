@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SonoVault, SonoVaultError } from "sonovault";
 import { z } from "zod";
 
-export const SERVER_VERSION = "1.0.3";
+export const SERVER_VERSION = "1.0.4";
 
 /** Serialize an API result as a pretty-printed JSON text block. */
 function json(data: unknown) {
@@ -222,7 +222,7 @@ export function createServer(sv: SonoVault): McpServer {
     "get_release",
     {
       title: "Get release with tracklist",
-      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs. Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null.",
+      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs. Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null. Also returns musicbrainz_release_ids and musicbrainz_release_group_ids: arrays, because a SonoVault release groups every edition of an album and each edition has its own MBID.",
       inputSchema: { id: z.number().int().describe("SonoVault release ID") },
     },
     wrap(async ({ id }) => sv.releases.get(id)),

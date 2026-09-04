@@ -46,6 +46,8 @@ function fakeSv(overrides: Record<string, unknown> = {}) {
       get: async () => ({
         id: 1,
         title: "Discovery",
+        musicbrainz_release_ids: ["bd3bb36e-16c8-438f-850e-dfbf4d1478f0"],
+        musicbrainz_release_group_ids: ["48117b90-a16e-34ca-a514-19c702df1158"],
         tracks: [
           { id: 1, title: "One More Time", artists: [], isrc: "GBDUW0000053", duration: 320, genre: [], subgenre: [], disc_number: 1, track_number: 1 },
           { id: 2, title: "Aerodynamic", artists: [], isrc: null, duration: 212, genre: [], subgenre: [], disc_number: 1, track_number: 2 },
@@ -163,6 +165,14 @@ describe("sonovault-mcp", () => {
     expect(unknown.disc_number).toBeNull();
   });
 
+  it("get_release returns the MusicBrainz id arrays", async () => {
+    const result = await client.callTool({ name: "get_release", arguments: { id: 1 } });
+    const body = JSON.parse((result as any).content[0].text);
+
+    expect(body.musicbrainz_release_ids).toEqual(["bd3bb36e-16c8-438f-850e-dfbf4d1478f0"]);
+    expect(body.musicbrainz_release_group_ids).toEqual(["48117b90-a16e-34ca-a514-19c702df1158"]);
+  });
+
   it("search_artists returns musicbrainz_id alongside wikidata_id", async () => {
     const result = await client.callTool({ name: "search_artists", arguments: { name: "Daft Punk" } });
     const body = JSON.parse((result as any).content[0].text);
@@ -177,6 +187,7 @@ describe("sonovault-mcp", () => {
     const artists = tools.find((t) => t.name === "search_artists");
 
     expect(release?.description).toMatch(/playing order/);
+    expect(release?.description).toMatch(/musicbrainz_release_ids/);
     expect(release?.description).toMatch(/track_number/);
     expect(artists?.description).toMatch(/musicbrainz_id/);
   });
