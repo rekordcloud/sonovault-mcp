@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SonoVault, SonoVaultError } from "sonovault";
 import { z } from "zod";
 
-export const SERVER_VERSION = "1.0.4";
+export const SERVER_VERSION = "1.1.0";
 
 /** Serialize an API result as a pretty-printed JSON text block. */
 function json(data: unknown) {
@@ -222,10 +222,13 @@ export function createServer(sv: SonoVault): McpServer {
     "get_release",
     {
       title: "Get release with tracklist",
-      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs. Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null. Also returns musicbrainz_release_ids and musicbrainz_release_group_ids: arrays, because a SonoVault release groups every edition of an album and each edition has its own MBID.",
-      inputSchema: { id: z.number().int().describe("SonoVault release ID") },
+      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs. Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null. A SonoVault release groups every edition of an album onto one record, so the response also carries an editions array naming the real editions behind it, each with its provider, format, release date, barcode, country and track count; pass one of their ids as `edition` to render that edition's numbering instead of the default consensus. musicbrainz_release_ids and musicbrainz_release_group_ids are arrays for the same reason.",
+      inputSchema: {
+        id: z.number().int().describe("SonoVault release ID"),
+        edition: z.number().int().optional().describe("Edition id from the response's editions array. Renders that edition's track numbering; tracks it does not carry keep a null position and come last."),
+      },
     },
-    wrap(async ({ id }) => sv.releases.get(id)),
+    wrap(async ({ id, edition }) => sv.releases.get(id, { edition })),
   );
 
   server.registerTool(

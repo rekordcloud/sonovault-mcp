@@ -5,6 +5,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-14
+
+### Added
+
+- `get_release` accepts `edition`, rendering one edition's track numbering instead of the default consensus. Its response now also carries `editions`: the real editions behind a release, since a SonoVault release groups every edition of an album onto one record.
+
+### Changed
+
+- Requires `sonovault` ^4.1.0.
+
 ## [1.0.4] - 2026-09-04
 
 ### Changed
