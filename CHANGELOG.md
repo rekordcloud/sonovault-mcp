@@ -5,6 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Changed
+
+- `get_release` describes each edition's `label` and `catalog_no`: the label that issued that pressing and its catalog number.
+
 ## [1.1.0] - 2026-09-14
 
 ### Added
