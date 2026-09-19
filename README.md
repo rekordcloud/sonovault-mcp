@@ -92,7 +92,7 @@ Any client that speaks MCP over stdio works. Command: `npx -y sonovault-mcp` wit
 | `get_platform_links` | One track's ID and deep link on all 7 platforms, from any ID or ISRC. |
 | `resolve_tracks` | Bulk resolve up to 100 track names, ISRCs, or platform IDs. |
 | `search_artists`, `get_artist_releases` | Artist search and discography, with Wikidata and MusicBrainz identifiers. |
-| `search_labels`, `get_label_releases` | Label search and catalog. |
+| `search_labels`, `get_label_releases` | Label search and catalog, optionally for one release date or a date range. |
 | `search_releases`, `get_release` | Release search, and tracklists with ISRCs in playing order with disc and track numbers, plus MusicBrainz release and release-group ids. `get_release` also lists the real editions behind a release, each with its own label and catalog number, and takes an `edition` id to render that edition's numbering. |
 | `list_genres` | The canonical genre hierarchy. |
 | `browse_tracks` | Discover by label, artist, genre, or year (paid tier). |

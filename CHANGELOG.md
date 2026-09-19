@@ -5,9 +5,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-19
+
+### Added
+
+- `get_label_releases` and `get_artist_releases` accept `from` and `until` (inclusive `YYYY-MM-DD` release dates), so an assistant can ask what a label released on one day.
+
 ### Changed
 
 - `get_release` describes each edition's `label` and `catalog_no`: the label that issued that pressing and its catalog number.
+- Requires `sonovault` ^4.2.0.
 
 ## [1.1.0] - 2026-09-14
 

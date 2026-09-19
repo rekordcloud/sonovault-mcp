@@ -113,6 +113,26 @@ describe("sonovault-mcp", () => {
     expect(result.isError).toBeFalsy();
   });
 
+  it("get_label_releases and get_artist_releases pass the date range through", async () => {
+    const calls: unknown[] = [];
+    const sv = fakeSv({
+      labels: { releases: async (id: number, p: unknown) => (calls.push(["label", id, p]), { results: [], next_cursor: null }) },
+      artists: { releases: async (id: number, p: unknown) => (calls.push(["artist", id, p]), { results: [], next_cursor: null }) },
+    });
+    const c = await connect(sv);
+    await c.callTool({ name: "get_label_releases", arguments: { label_id: 11933, from: "2026-09-11", until: "2026-09-11" } });
+    await c.callTool({ name: "get_artist_releases", arguments: { artist_id: 42, from: "2001-01-01" } });
+    expect(calls).toEqual([
+      ["label", 11933, { limit: undefined, cursor: undefined, from: "2026-09-11", until: "2026-09-11" }],
+      ["artist", 42, { limit: undefined, cursor: undefined, from: "2001-01-01", until: undefined }],
+    ]);
+  });
+
+  it("rejects a malformed release date", async () => {
+    const result = await client.callTool({ name: "get_label_releases", arguments: { label_id: 1, from: "11-09-2026" } });
+    expect(result.isError).toBe(true);
+  });
+
   it("get_work_codes passes isrc through", async () => {
     const result = await client.callTool({
       name: "get_work_codes",

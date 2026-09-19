@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SonoVault, SonoVaultError } from "sonovault";
 import { z } from "zod";
 
-export const SERVER_VERSION = "1.1.0";
+export const SERVER_VERSION = "1.2.0";
 
 /** Serialize an API result as a pretty-printed JSON text block. */
 function json(data: unknown) {
@@ -19,6 +19,9 @@ function toolError(err: unknown) {
       : `Error: ${(err as Error).message}`;
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
+
+/** A calendar day, as the API's release-date filters take it. */
+const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD");
 
 function wrap<A extends unknown[]>(fn: (...args: A) => Promise<unknown>) {
   return async (...args: A) => {
@@ -167,14 +170,16 @@ export function createServer(sv: SonoVault): McpServer {
     "get_artist_releases",
     {
       title: "Artist releases",
-      description: "An artist's releases, newest first. Use the cursor from a previous call for the next page.",
+      description: "An artist's releases, newest first. Use the cursor from a previous call for the next page. Optional from/until (YYYY-MM-DD, inclusive) limit it to a release-date range.",
       inputSchema: {
         artist_id: z.number().int().describe("SonoVault artist ID (from search_artists)"),
         limit: z.number().int().min(1).max(100).optional(),
         cursor: z.string().optional().describe("next_cursor from the previous page"),
+        from: DATE.optional().describe("Only releases dated on or after this day (YYYY-MM-DD)"),
+        until: DATE.optional().describe("Only releases dated on or before this day (YYYY-MM-DD)"),
       },
     },
-    wrap(async ({ artist_id, limit, cursor }) => sv.artists.releases(artist_id, { limit, cursor })),
+    wrap(async ({ artist_id, limit, cursor, from, until }) => sv.artists.releases(artist_id, { limit, cursor, from, until })),
   );
 
   server.registerTool(
@@ -194,14 +199,16 @@ export function createServer(sv: SonoVault): McpServer {
     "get_label_releases",
     {
       title: "Label releases",
-      description: "A label's releases, newest first, with artist per release. Cursor-paginated.",
+      description: "A label's releases, newest first, with artist per release. Cursor-paginated. Optional from/until (YYYY-MM-DD, inclusive) limit it to a release-date range; pass the same day for both to see what the label released that day.",
       inputSchema: {
         label_id: z.number().int().describe("SonoVault label ID (from search_labels)"),
         limit: z.number().int().min(1).max(100).optional(),
         cursor: z.string().optional(),
+        from: DATE.optional().describe("Only releases dated on or after this day (YYYY-MM-DD)"),
+        until: DATE.optional().describe("Only releases dated on or before this day (YYYY-MM-DD)"),
       },
     },
-    wrap(async ({ label_id, limit, cursor }) => sv.labels.releases(label_id, { limit, cursor })),
+    wrap(async ({ label_id, limit, cursor, from, until }) => sv.labels.releases(label_id, { limit, cursor, from, until })),
   );
 
   server.registerTool(
