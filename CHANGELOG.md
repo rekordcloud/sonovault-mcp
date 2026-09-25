@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-25
+
+### Changed
+
+- `get_platform_links` and `resolve_tracks` explain that `discogs_id` is a Discogs track key (release ID plus track position, e.g. `2844-A`). A bare release ID returns not found, and assistants were likely to guess one.
+
 ## [1.2.0] - 2026-09-19
 
 ### Added

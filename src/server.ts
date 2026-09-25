@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SonoVault, SonoVaultError } from "sonovault";
 import { z } from "zod";
 
-export const SERVER_VERSION = "1.2.0";
+export const SERVER_VERSION = "1.2.1";
 
 /** Serialize an API result as a pretty-printed JSON text block. */
 function json(data: unknown) {
@@ -117,7 +117,10 @@ export function createServer(sv: SonoVault): McpServer {
         applemusic_id: z.string().optional(),
         tidal_id: z.string().optional(),
         beatport_id: z.string().optional(),
-        discogs_id: z.string().optional(),
+        discogs_id: z
+          .string()
+          .optional()
+          .describe("Discogs track key: release ID plus track position, e.g. '2844-A'. A bare release ID matches nothing."),
         musicbrainz_id: z.string().optional(),
         youtube_id: z.string().optional(),
       },
@@ -130,7 +133,7 @@ export function createServer(sv: SonoVault): McpServer {
     {
       title: "Bulk resolve",
       description:
-        "Resolve up to 100 inputs in one call to canonical tracks plus cross-platform links. input_type picks the key: 'track_name' (items are {artist, title} objects), 'isrc', 'sonovault_id', or a platform id type ('spotify_id', 'applemusic_id', 'tidal_id', 'beatport_id', 'discogs_id', 'musicbrainz_id'). Costs one API credit per line.",
+        "Resolve up to 100 inputs in one call to canonical tracks plus cross-platform links. input_type picks the key: 'track_name' (items are {artist, title} objects), 'isrc', 'sonovault_id', or a platform id type ('spotify_id', 'applemusic_id', 'tidal_id', 'beatport_id', 'discogs_id', 'musicbrainz_id'). A discogs_id item is a Discogs track key (release ID plus track position, e.g. '2844-A'), not a bare release ID. Costs one API credit per line.",
       inputSchema: {
         input_type: z.enum([
           "track_name",

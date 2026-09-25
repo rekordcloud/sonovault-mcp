@@ -49,7 +49,7 @@ One canonical track can carry many ISRCs (radio edit, remaster, reissue each min
 
 ### Cross-platform IDs and links
 
-Pass exactly ONE identifying parameter: `id`, `isrc`, `spotify_id`, `applemusic_id`, `tidal_id`, `beatport_id`, `discogs_id`, `musicbrainz_id`, or `youtube_id`.
+Pass exactly ONE identifying parameter: `id`, `isrc`, `spotify_id`, `applemusic_id`, `tidal_id`, `beatport_id`, `discogs_id`, `musicbrainz_id`, or `youtube_id`. A `discogs_id` is a Discogs track key (release ID plus track position, e.g. `2844-A`), never a bare release ID.
 
 ```bash
 curl -s "https://api.sonovault.now/v1/tracks/links?isrc=GBDUW0000053" -H "x-api-key: $SONOVAULT_API_KEY"
