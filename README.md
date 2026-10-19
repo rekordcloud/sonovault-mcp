@@ -140,7 +140,7 @@ Yes. Every track carries `bpm` (full tempo, up to 2 decimals, so 174 rather than
 - `key_musical`: standard notation, e.g. `D`, `Am`, `F#m`, `Ebm`.
 - `key_open`: Open Key notation, lowercase, e.g. `3d`, `1m`.
 
-`keys` lists every key held for the track, one entry per source. Key comes from OpenKeyScan and BPM from the Lexicon beat detector (trusted by 100k+ DJs), both run by SonoVault on the audio. Daft Punk's One More Time comes back as 123 BPM, `10B` / `D` / `3d`. All of these are null (and `keys` empty) for a track that has not been analysed yet. Other audio features such as energy or danceability are not exposed.
+`keys` lists every key held for the track, one entry per source. Key comes from OpenKeyScan and BPM from the Lexicon DJ beat detector (trusted by 100k+ DJs), both run by SonoVault on the audio. Daft Punk's One More Time comes back as 123 BPM, `10B` / `D` / `3d`. All of these are null (and `keys` empty) for a track that has not been analysed yet. Other audio features such as energy or danceability are not exposed.
 
 ### Where does the data come from?
 
