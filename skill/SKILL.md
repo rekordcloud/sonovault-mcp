@@ -1,12 +1,12 @@
 ---
 name: sonovault-music-metadata
-description: Look up music metadata with the SonoVault API. Use when the user needs track, artist, label, or release data. ISRC or ISWC codes, genre, release dates, or a track's IDs and links on Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, or YouTube. Covers single lookups, bulk resolution of play logs and library exports, and royalty-reporting enrichment.
+description: Look up music metadata with the SonoVault API. Use when the user needs track, artist, label, or release data. ISRC or ISWC codes, genre, BPM and musical key, release dates, or a track's IDs and links on Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, or YouTube. Covers single lookups, bulk resolution of play logs and library exports, and royalty-reporting enrichment.
 license: MIT
 metadata:
   author: rekordcloud
 ---
 
-You query the SonoVault music metadata API: 93M+ tracks with ISRC, ISWC, genre, label, release dates, and cross-platform IDs.
+You query the SonoVault music metadata API: 93M+ tracks with ISRC, ISWC, genre, BPM, musical key, label, release dates, and cross-platform IDs.
 
 ## Setup
 
@@ -35,7 +35,19 @@ curl -s "https://api.sonovault.now/v1/tracks/search?artist=Daft+Punk&title=One+M
   -H "x-api-key: $SONOVAULT_API_KEY"
 ```
 
-Each result carries `id`, `title`, `artists`, `isrc`, `duration`, `genre`, `subgenre`, and `releases` (album title, label, release_date). The search is fuzzy: it survives `(Original Mix)` suffixes, `feat.` credits, and messy casing, so pass raw playout strings as-is.
+Each result carries `id`, `title`, `artists`, `isrc`, `duration`, `bpm`, `key_alphanumeric`, `key_musical`, `key_open`, `keys`, `genre`, `subgenre`, and `releases` (album title, label, release_date). The search is fuzzy: it survives `(Original Mix)` suffixes, `feat.` credits, and messy casing, so pass raw playout strings as-is.
+
+### Tempo and key
+
+Every track (search, ISRC lookup, by id, browse, resolve, release tracklists) carries:
+
+- `bpm`: full tempo, up to 2 decimals (174, not 87).
+- `key_alphanumeric`: 1 to 12 plus `A` (minor) or `B` (major), e.g. `10B`.
+- `key_musical`: e.g. `D`, `Am`, `F#m`, `Ebm`.
+- `key_open`: Open Key notation, lowercase, e.g. `3d`, `1m`.
+- `keys`: every key held, one `{key_alphanumeric, key_musical, key_open, source}` per source.
+
+Use them for harmonic mixing (same alphanumeric number, the same number with the other letter, or one number up or down mix cleanly) and for tempo questions (filtering a set by BPM range, spotting half or double time). Null values (and an empty `keys`) mean the track has not been analysed yet, not that it has no key; say so rather than guessing a value.
 
 ### Look up by ISRC
 
@@ -88,7 +100,7 @@ Radio play logs carry artist + title but royalty reports (SoundExchange, PPL, Se
 ## Errors and limits
 
 - 401: bad or missing key. 403 with "paid" wording: the endpoint needs a paid tier (`/v1/tracks/browse`, audio identify). 429: rate limit (retry after the `Retry-After` header) or monthly credits exhausted (do not retry; tell the user).
-- The public API does NOT expose BPM, musical key, popularity scores, audio previews, artwork, or lyrics. Say so instead of guessing.
+- The public API does NOT expose popularity scores, energy, danceability, artwork, or lyrics. Say so instead of guessing.
 
 ## References
 

@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SonoVault, SonoVaultError } from "sonovault";
 import { z } from "zod";
 
-export const SERVER_VERSION = "1.2.1";
+export const SERVER_VERSION = "1.3.0";
 
 /** Serialize an API result as a pretty-printed JSON text block. */
 function json(data: unknown) {
@@ -19,6 +19,10 @@ function toolError(err: unknown) {
       : `Error: ${(err as Error).message}`;
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
+
+/** How every track-returning tool describes the tempo and key fields. */
+const KEY_BPM =
+  "bpm (full tempo, e.g. 123) and musical key in three notations: key_alphanumeric (e.g. '10B'), key_musical (e.g. 'D', 'F#m') and key_open (Open Key, e.g. '3d'), plus keys[] with one entry per source. All null (keys empty) when the track has not been analysed.";
 
 /** A calendar day, as the API's release-date filters take it. */
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD");
@@ -45,7 +49,8 @@ export function createServer(sv: SonoVault): McpServer {
     {
       title: "Search tracks",
       description:
-        "Search the SonoVault catalog (93M+ tracks) by artist and title. Both are required; there is no free-text search. Returns ISRC, genre, duration, artist credits, and release info (album, label, release date) per track.",
+        "Search the SonoVault catalog (93M+ tracks) by artist and title. Both are required; there is no free-text search. Returns ISRC, genre, duration, BPM, musical key, artist credits, and release info (album, label, release date) per track. Tempo and key: " +
+        KEY_BPM,
       inputSchema: {
         artist: z.string().describe("Artist name, e.g. 'Daft Punk'"),
         title: z.string().describe("Track title, e.g. 'One More Time'"),
@@ -59,7 +64,7 @@ export function createServer(sv: SonoVault): McpServer {
     "get_track",
     {
       title: "Get track by ID",
-      description: "Fetch one track by its SonoVault track ID, with full metadata.",
+      description: "Fetch one track by its SonoVault track ID, with full metadata (ISRC, genre, duration, BPM, musical key, artist credits, releases). Tempo and key: " + KEY_BPM,
       inputSchema: { id: z.number().int().describe("SonoVault track ID") },
     },
     wrap(async ({ id }) => sv.tracks.get(id)),
@@ -70,7 +75,8 @@ export function createServer(sv: SonoVault): McpServer {
     {
       title: "Look up a track by ISRC",
       description:
-        "Exact lookup of a recording by its ISRC (International Standard Recording Code, e.g. GBDUW0000053). Returns the track's full metadata.",
+        "Exact lookup of a recording by its ISRC (International Standard Recording Code, e.g. GBDUW0000053). Returns the track's full metadata, including BPM and musical key. Tempo and key: " +
+        KEY_BPM,
       inputSchema: { isrc: z.string().describe("ISRC code, e.g. GBDUW0000053") },
     },
     wrap(async ({ isrc }) => sv.tracks.byIsrc(isrc)),
@@ -133,7 +139,7 @@ export function createServer(sv: SonoVault): McpServer {
     {
       title: "Bulk resolve",
       description:
-        "Resolve up to 100 inputs in one call to canonical tracks plus cross-platform links. input_type picks the key: 'track_name' (items are {artist, title} objects), 'isrc', 'sonovault_id', or a platform id type ('spotify_id', 'applemusic_id', 'tidal_id', 'beatport_id', 'discogs_id', 'musicbrainz_id'). A discogs_id item is a Discogs track key (release ID plus track position, e.g. '2844-A'), not a bare release ID. Costs one API credit per line.",
+        "Resolve up to 100 inputs in one call to canonical tracks plus cross-platform links. input_type picks the key: 'track_name' (items are {artist, title} objects), 'isrc', 'sonovault_id', or a platform id type ('spotify_id', 'applemusic_id', 'tidal_id', 'beatport_id', 'discogs_id', 'musicbrainz_id'). A discogs_id item is a Discogs track key (release ID plus track position, e.g. '2844-A'), not a bare release ID. Each matched track carries the same fields as get_track, including BPM and musical key. Costs one API credit per line.",
       inputSchema: {
         input_type: z.enum([
           "track_name",
@@ -232,7 +238,7 @@ export function createServer(sv: SonoVault): McpServer {
     "get_release",
     {
       title: "Get release with tracklist",
-      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs. Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null. A SonoVault release groups every edition of an album onto one record, so the response also carries an editions array naming the real editions behind it, each with its provider, format, release date, barcode, country, track count, label and catalog number (pressings of one album often carry different labels); pass one of their ids as `edition` to render that edition's numbering instead of the default consensus. musicbrainz_release_ids and musicbrainz_release_group_ids are arrays for the same reason.",
+      description: "Fetch one release by SonoVault release ID, including its full tracklist with ISRCs, BPM and musical key per track (same bpm/key_* fields as get_track, null when not analysed). Tracks come back in playing order, each with disc_number and track_number; a track whose position is unknown sorts last with both null. A SonoVault release groups every edition of an album onto one record, so the response also carries an editions array naming the real editions behind it, each with its provider, format, release date, barcode, country, track count, label and catalog number (pressings of one album often carry different labels); pass one of their ids as `edition` to render that edition's numbering instead of the default consensus. musicbrainz_release_ids and musicbrainz_release_group_ids are arrays for the same reason.",
       inputSchema: {
         id: z.number().int().describe("SonoVault release ID"),
         edition: z.number().int().optional().describe("Edition id from the response's editions array. Renders that edition's track numbering; tracks it does not carry keep a null position and come last."),

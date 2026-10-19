@@ -5,6 +5,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-19
+
+### Added
+
+- Tracks now come back with BPM and musical key: `bpm` (full tempo), `key_alphanumeric` (e.g. `10B`), `key_musical` (e.g. `D`, `F#m`), `key_open` (Open Key, e.g. `3d`) and `keys` (one entry per source). `search_tracks`, `get_track`, `lookup_isrc`, `resolve_tracks` and `get_release` say so in their descriptions, so an assistant can answer harmonic-mixing and tempo questions. The values are null when a track has not been analysed. Key comes from OpenKeyScan and BPM from the Lexicon beat detector, both run by SonoVault on the audio.
+
+### Changed
+
+- README FAQ and `skill/SKILL.md` no longer say BPM and key are excluded; they explain the three key notations instead. Popularity scores, energy, danceability, artwork and lyrics remain unavailable.
+
 ## [1.2.1] - 2026-09-25
 
 ### Changed

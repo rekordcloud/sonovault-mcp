@@ -11,9 +11,16 @@ const TRACK = {
   isrc: "GBDUW0000053",
   releases: [],
   duration: 320,
+  bpm: 123,
+  key_alphanumeric: "10B",
+  key_musical: "D",
+  key_open: "3d",
+  keys: [{ key_alphanumeric: "10B", key_musical: "D", key_open: "3d", source: "openkeyscan" }],
   genre: ["House"],
   subgenre: [],
 };
+
+const UNANALYSED = { bpm: null, key_alphanumeric: null, key_musical: null, key_open: null, keys: [] };
 
 function fakeSv(overrides: Record<string, unknown> = {}) {
   const err403 = Object.assign(new Error("Paid plan required"), { status: 403 });
@@ -49,9 +56,9 @@ function fakeSv(overrides: Record<string, unknown> = {}) {
         musicbrainz_release_ids: ["bd3bb36e-16c8-438f-850e-dfbf4d1478f0"],
         musicbrainz_release_group_ids: ["48117b90-a16e-34ca-a514-19c702df1158"],
         tracks: [
-          { id: 1, title: "One More Time", artists: [], isrc: "GBDUW0000053", duration: 320, genre: [], subgenre: [], disc_number: 1, track_number: 1 },
-          { id: 2, title: "Aerodynamic", artists: [], isrc: null, duration: 212, genre: [], subgenre: [], disc_number: 1, track_number: 2 },
-          { id: 3, title: "Unknown Slot", artists: [], isrc: null, duration: null, genre: [], subgenre: [], disc_number: null, track_number: null },
+          { id: 1, title: "One More Time", artists: [], isrc: "GBDUW0000053", duration: 320, bpm: 123, key_alphanumeric: "10B", key_musical: "D", key_open: "3d", keys: TRACK.keys, genre: [], subgenre: [], disc_number: 1, track_number: 1 },
+          { id: 2, title: "Aerodynamic", artists: [], isrc: null, duration: 212, ...UNANALYSED, genre: [], subgenre: [], disc_number: 1, track_number: 2 },
+          { id: 3, title: "Unknown Slot", artists: [], isrc: null, duration: null, ...UNANALYSED, genre: [], subgenre: [], disc_number: null, track_number: null },
         ],
       }),
     },
@@ -211,5 +218,35 @@ describe("sonovault-mcp", () => {
     expect(release?.description).toMatch(/track_number/);
     expect(artists?.description).toMatch(/musicbrainz_id/);
   });
-});
 
+  it("passes bpm and the key fields through untouched", async () => {
+    const result = await client.callTool({ name: "lookup_isrc", arguments: { isrc: "GBDUW0000053" } });
+    const body = JSON.parse((result as any).content[0].text);
+
+    expect(body.bpm).toBe(123);
+    expect(body.key_alphanumeric).toBe("10B");
+    expect(body.key_musical).toBe("D");
+    expect(body.key_open).toBe("3d");
+    expect(body.keys).toEqual([{ key_alphanumeric: "10B", key_musical: "D", key_open: "3d", source: "openkeyscan" }]);
+  });
+
+  it("get_release carries bpm and key per track, null when not analysed", async () => {
+    const result = await client.callTool({ name: "get_release", arguments: { id: 1 } });
+    const body = JSON.parse((result as any).content[0].text);
+
+    expect(body.tracks[0].bpm).toBe(123);
+    expect(body.tracks[0].key_open).toBe("3d");
+    expect(body.tracks[1].bpm).toBeNull();
+    expect(body.tracks[1].key_alphanumeric).toBeNull();
+    expect(body.tracks[1].keys).toEqual([]);
+  });
+
+  it("tells the model which track tools return BPM and key", async () => {
+    const { tools } = await client.listTools();
+    for (const name of ["search_tracks", "get_track", "lookup_isrc", "get_release"]) {
+      const description = tools.find((t) => t.name === name)?.description ?? "";
+      expect(description, name).toMatch(/BPM/);
+      expect(description, name).toMatch(/key_alphanumeric|bpm\/key_\*/);
+    }
+  });
+});

@@ -1,19 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "io.github.rekordcloud/sonovault",
-  "description": "Search 93M+ tracks, artists, and releases: metadata, ISRC/ISWC, and cross-platform IDs for AI.",
+  "description": "Search 93M+ tracks, artists, and releases: metadata, BPM, key, ISRC/ISWC, cross-platform IDs for AI.",
   "repository": {
     "url": "https://github.com/rekordcloud/sonovault-mcp",
     "source": "github"
   },
-  "version": "1.2.1",
+  "version": "1.3.0",
   "websiteUrl": "https://sonovault.now",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "sonovault-mcp",
-      "version": "1.2.1",
+      "version": "1.3.0",
       "transport": {
         "type": "stdio"
       },

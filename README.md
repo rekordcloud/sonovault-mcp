@@ -3,12 +3,13 @@
 [![CI](https://github.com/rekordcloud/sonovault-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rekordcloud/sonovault-mcp/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/sonovault-mcp)](https://www.npmjs.com/package/sonovault-mcp)
 
-MCP server for the **[SonoVault](https://sonovault.now)** music metadata API. Gives Claude, Cursor, and any MCP client search across 93M+ tracks, artists, labels, and releases, with full metadata per result: genre, label, release dates, artist credits, ISRC and ISWC codes, and cross-platform IDs (Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, YouTube).
+MCP server for the **[SonoVault](https://sonovault.now)** music metadata API. Gives Claude, Cursor, and any MCP client search across 93M+ tracks, artists, labels, and releases, with full metadata per result: genre, BPM, musical key, label, release dates, artist credits, ISRC and ISWC codes, and cross-platform IDs (Spotify, Apple Music, Tidal, Beatport, Discogs, MusicBrainz, YouTube).
 
 Ask your assistant things like:
 
 - "What releases did mau5trap put out this year?"
 - "Find Daft Punk's Veridis Quo and give me its genre, label, and ISRC"
+- "What key and BPM is One More Time, and which tracks on Discovery mix well with it?"
 - "Show me the tracklist of Discovery with ISRCs"
 - "What's the Spotify and Beatport ID for ISRC GBDUW0000053?"
 - "Resolve this play log to ISRCs and labels" (paste up to 100 lines)
@@ -84,16 +85,16 @@ Any client that speaks MCP over stdio works. Command: `npx -y sonovault-mcp` wit
 
 | Tool | What it does |
 |---|---|
-| `search_tracks` | Fuzzy search by artist + title. Returns ISRC, genre, label, release date. |
-| `lookup_isrc` | Exact recording lookup by ISRC. |
-| `get_track` | Fetch a track by SonoVault ID. |
+| `search_tracks` | Fuzzy search by artist + title. Returns ISRC, genre, BPM, musical key, label, release date. |
+| `lookup_isrc` | Exact recording lookup by ISRC, with BPM and musical key. |
+| `get_track` | Fetch a track by SonoVault ID, with BPM and musical key. |
 | `get_work_codes` | Recording to composition: the ISWC(s) behind a recording. |
 | `get_recordings_of_work` | Composition to recordings: every recording of an ISWC. |
 | `get_platform_links` | One track's ID and deep link on all 7 platforms, from any ID or ISRC. |
 | `resolve_tracks` | Bulk resolve up to 100 track names, ISRCs, or platform IDs. |
 | `search_artists`, `get_artist_releases` | Artist search and discography, with Wikidata and MusicBrainz identifiers. |
 | `search_labels`, `get_label_releases` | Label search and catalog, optionally for one release date or a date range. |
-| `search_releases`, `get_release` | Release search, and tracklists with ISRCs in playing order with disc and track numbers, plus MusicBrainz release and release-group ids. `get_release` also lists the real editions behind a release, each with its own label and catalog number, and takes an `edition` id to render that edition's numbering. |
+| `search_releases`, `get_release` | Release search, and tracklists with ISRCs, BPM and key in playing order with disc and track numbers, plus MusicBrainz release and release-group ids. `get_release` also lists the real editions behind a release, each with its own label and catalog number, and takes an `edition` id to render that edition's numbering. |
 | `list_genres` | The canonical genre hierarchy. |
 | `browse_tracks` | Discover by label, artist, genre, or year (paid tier). |
 
@@ -107,7 +108,7 @@ Paste a play log with just artist and title, and ask: "Resolve these to ISRC, al
 
 ### Clean up a DJ library
 
-"Here are 50 tracks from my rekordbox export. Find the canonical version of each, flag duplicates that share an ISRC, and tag each with its genre." The assistant combines `resolve_tracks` with the genre fields on each result.
+"Here are 50 tracks from my rekordbox export. Find the canonical version of each, flag duplicates that share an ISRC, and tag each with its genre, BPM and key." The assistant combines `resolve_tracks` with the genre, tempo and key fields on each result.
 
 ### Bridge recordings to compositions
 
@@ -129,11 +130,17 @@ Yes. A free SonoVault key includes 1,000 requests/month with no credit card. Eve
 
 ### What metadata does each track include?
 
-Title, artist credits (with primary/remixer flags), ISRC, duration, genre and subgenre, and per-release album title, label, and release date. ISWC work codes come from the dedicated work-code tools.
+Title, artist credits (with primary/remixer flags), ISRC, duration, BPM, musical key, genre and subgenre, and per-release album title, label, and release date. ISWC work codes come from the dedicated work-code tools.
 
 ### Does it return BPM or musical key?
 
-No. The public SonoVault API deliberately excludes audio features like BPM, key, and energy. No audio previews or artwork either.
+Yes. Every track carries `bpm` (full tempo, up to 2 decimals, so 174 rather than 87) and its musical key in three notations:
+
+- `key_alphanumeric`: 1 to 12 plus `A` for minor or `B` for major, e.g. `10B`. Neighbouring numbers and the same number with the other letter mix harmonically.
+- `key_musical`: standard notation, e.g. `D`, `Am`, `F#m`, `Ebm`.
+- `key_open`: Open Key notation, lowercase, e.g. `3d`, `1m`.
+
+`keys` lists every key held for the track, one entry per source. Key comes from OpenKeyScan and BPM from the Lexicon beat detector (trusted by 100k+ DJs), both run by SonoVault on the audio. Daft Punk's One More Time comes back as 123 BPM, `10B` / `D` / `3d`. All of these are null (and `keys` empty) for a track that has not been analysed yet. Other audio features such as energy or danceability are not exposed.
 
 ### Where does the data come from?
 
