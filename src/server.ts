@@ -87,7 +87,7 @@ export function createServer(sv: SonoVault): McpServer {
     {
       title: "Recording to composition (ISWC)",
       description:
-        "Find the ISWC work code(s) behind a recording, by ISRC or SonoVault track ID. Useful for royalty and publishing workflows. One recording can carry several ISWCs (medleys, samples).",
+        "Find the ISWC work code(s) behind a recording, by ISRC or SonoVault track ID. Useful for royalty and publishing workflows. By ISRC it returns the works linked to that exact ISRC (basis \"isrc\"), falling back to every work on the recording (basis \"recording\") when none is. One recording can carry several ISWCs (medleys, samples, a song registered under more than one ISWC).",
       inputSchema: {
         isrc: z.string().optional().describe("ISRC of the recording"),
         track_id: z.number().int().optional().describe("SonoVault track ID (alternative to isrc)"),
