@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-16
+
+### Changed
+
+- `get_release` describes the new `digital_upc` field: the UPC a release was delivered to digital stores with (12-digit UPC-A, or the 13-digit EAN when it does not fit), so an assistant can answer "what is the UPC of this release" without picking among CD and vinyl barcodes. Requires sonovault 4.5.1 for the typed field.
+
 ## [1.3.0] - 2026-10-19
 
 ### Added
