@@ -5,6 +5,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-22
+
+### Added
+
+- `get_release_by_upc`: find the release behind a UPC, EAN or GTIN barcode (`GET /v1/releases/upc/:upc`). Returns the title, artist, label, release date, the formats that carry the barcode and its `digital_upc`. Accepts 8 to 14 digits, and a 12-digit UPC-A finds the same release as its 13-digit EAN form. Free tier.
+
+### Changed
+
+- `search_releases` describes the `digital_upc` now on every result, so an assistant can answer "what is the UPC of this album" from an artist and title. Requires sonovault 4.6.0.
+
 ## [1.3.1] - 2026-11-16
 
 ### Changed

@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SonoVault, SonoVaultError } from "sonovault";
 import { z } from "zod";
 
-export const SERVER_VERSION = "1.3.1";
+export const SERVER_VERSION = "1.4.0";
 
 /** Serialize an API result as a pretty-printed JSON text block. */
 function json(data: unknown) {
@@ -224,7 +224,7 @@ export function createServer(sv: SonoVault): McpServer {
     "search_releases",
     {
       title: "Search releases (albums)",
-      description: "Search releases by title, optionally narrowed by artist name.",
+      description: "Search releases by title, optionally narrowed by artist name. Each result carries digital_upc, the UPC the release was delivered to digital stores with (null when no digital edition carries one), so an artist and album title are enough to answer \"what is the UPC of this album\".",
       inputSchema: {
         title: z.string().describe("Release/album title"),
         artist: z.string().optional().describe("Artist name to narrow the match"),
@@ -232,6 +232,18 @@ export function createServer(sv: SonoVault): McpServer {
       },
     },
     wrap(async ({ title, artist, limit }) => sv.releases.search({ title, artist, limit })),
+  );
+
+  server.registerTool(
+    "get_release_by_upc",
+    {
+      title: "Find a release by UPC or EAN",
+      description: "Find the release behind a UPC, EAN or GTIN barcode: title, artist, label, release date, the formats that carry the barcode (cd, vinyl, digital, ...) and its digital_upc. Accepts 8 to 14 digits; spaces and hyphens are ignored, and a 12-digit UPC-A finds the same release as its 13-digit EAN form with a leading zero. Only barcodes with title evidence on the release are matched, so a barcode reused across unrelated compilations does not return them. Returns an error with status 404 when no release carries the barcode. Use get_release with the returned id for the tracklist. To go the other way (album to UPC), use search_releases and read digital_upc.",
+      inputSchema: {
+        upc: z.string().describe("The barcode: UPC-A, EAN-13 or GTIN-14, e.g. 724384960650"),
+      },
+    },
+    wrap(async ({ upc }) => sv.releases.byUpc(upc)),
   );
 
   server.registerTool(

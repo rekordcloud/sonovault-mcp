@@ -50,6 +50,10 @@ function fakeSv(overrides: Record<string, unknown> = {}) {
     },
     releases: {
       search: async () => ({ results: [], next_cursor: null }),
+      byUpc: async (upc: string) => ({
+        upc,
+        results: [{ id: 1384, title: "Discovery", artist: { id: 1, name: "Daft Punk" }, label: { id: 10, name: "Virgin" }, release_date: "2001-03-12", digital_upc: upc, formats: ["digital"] }],
+      }),
       get: async () => ({
         id: 1,
         title: "Discovery",
@@ -93,6 +97,7 @@ describe("sonovault-mcp", () => {
         "get_platform_links",
         "get_recordings_of_work",
         "get_release",
+        "get_release_by_upc",
         "get_track",
         "get_work_codes",
         "list_genres",
@@ -107,6 +112,15 @@ describe("sonovault-mcp", () => {
     for (const tool of tools) {
       expect(tool.description).toBeTruthy();
     }
+  });
+
+  it("get_release_by_upc passes the barcode through and returns the release", async () => {
+    const result = await client.callTool({ name: "get_release_by_upc", arguments: { upc: "724384960650" } });
+    const text = (result.content as Array<{ type: string; text: string }>)[0].text;
+    const body = JSON.parse(text);
+    expect(body.upc).toBe("724384960650");
+    expect(body.results[0].title).toBe("Discovery");
+    expect(body.results[0].formats).toEqual(["digital"]);
   });
 
   it("search_tracks returns track JSON", async () => {
